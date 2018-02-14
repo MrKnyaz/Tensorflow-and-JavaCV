@@ -24,6 +24,7 @@ public class Classificator {
             modelGraph.importGraphDef(graphData);
             session = new Session(modelGraph);
 
+            //Just print two main operations to look at shapes
             System.out.println(modelGraph.operation("input").output(0));
             System.out.println(modelGraph.operation("output").output(0));
         } catch(Exception e) {e.printStackTrace(); throw new RuntimeException(e);}
