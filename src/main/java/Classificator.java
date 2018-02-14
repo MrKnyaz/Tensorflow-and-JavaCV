@@ -10,7 +10,7 @@ import java.util.List;
 public class Classificator {
 
     Graph modelGraph;
-    Session sess;
+    Session session;
     List<String> labels;
 
     public Classificator() {
@@ -22,7 +22,7 @@ public class Classificator {
 
             modelGraph = new Graph();
             modelGraph.importGraphDef(graphData);
-            sess = new Session(modelGraph);
+            session = new Session(modelGraph);
 
             System.out.println(modelGraph.operation("input").output(0));
             System.out.println(modelGraph.operation("output").output(0));
@@ -36,7 +36,7 @@ public class Classificator {
     }
 
     private float[][] predict(Tensor imageTensor) {
-        Tensor result = sess.runner()
+        Tensor result = session.runner()
                 .feed("input", imageTensor)
                 .fetch("output").run().get(0);
         //create prediction buffer
