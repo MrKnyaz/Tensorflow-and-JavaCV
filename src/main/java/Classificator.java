@@ -5,6 +5,7 @@ import org.tensorflow.Tensor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Classificator {
@@ -23,37 +24,39 @@ public class Classificator {
             modelGraph = new Graph();
             modelGraph.importGraphDef(graphData);
             session = new Session(modelGraph);
-
-            //Just print two main operations to look at shapes
-            System.out.println(modelGraph.operation("input").output(0));
-            System.out.println(modelGraph.operation("output").output(0));
         } catch(Exception e) {e.printStackTrace(); throw new RuntimeException(e);}
     }
 
-    public String classify(float[][][][] imageData) {
+    public List<String> classify(float[][][][] imageData) {
         Tensor imageTensor = Tensor.create(imageData, Float.class);
-        float[][] output = predict(imageTensor);
-        return findPredictedLabel(output);
+        float[][] prediction = predict(imageTensor);
+        return findPredictedLabel(prediction);
     }
 
     private float[][] predict(Tensor imageTensor) {
         Tensor result = session.runner()
                 .feed("input", imageTensor)
                 .fetch("output").run().get(0);
+        int batchSize = (int)result.shape()[0];
         //create prediction buffer
-        float[][] prediction = new float[1][1008];
+        float[][] prediction = new float[batchSize][1008];
         result.copyTo(prediction);
         return prediction;
     }
 
-    private String findPredictedLabel(float[][] prediction) {
-        int maxValueIndex = 0;
-        for (int i = 1; i < prediction[0].length; i++) {
-            if (prediction[0][maxValueIndex] < prediction[0][i]) {
-                maxValueIndex = i;
+    private List<String> findPredictedLabel(float[][] prediction) {
+        List<String> result = new ArrayList<>();
+        int batchSize = prediction.length;
+        for (int i = 0; i < batchSize; i++) {
+            //Finding maximum value for each predicted image
+            int maxValueIndex = 0;
+            for (int j = 1; j < prediction[i].length; j++) {
+                if (prediction[i][maxValueIndex] < prediction[i][j]) {
+                    maxValueIndex = j;
+                }
             }
+            result.add(labels.get(maxValueIndex) + ": " + (prediction[i][maxValueIndex] * 100) + "%");
         }
-        System.out.println(prediction[0][maxValueIndex]);
-        return labels.get(maxValueIndex);
+        return result;
     }
 }
