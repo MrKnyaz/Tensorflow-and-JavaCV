@@ -9,7 +9,8 @@ public class Main {
          * */
         ImageProcessor imageProcessor = new ImageProcessor();
         Classificator classificator = new Classificator();
-        List<String> result = classificator.classify(imageProcessor.loadAndNormalizeImages("images/ship.jpg", "images/hyndai.jpg"));
+        float[][][][] imageData = imageProcessor.loadAndNormalizeImages("images/ship.jpg", "images/dog.jpg");
+        List<String> result = classificator.classify(imageData);
         for(String label: result) {
             System.out.println(label);
         }
