@@ -10,9 +10,9 @@ import java.util.List;
 
 public class Classificator {
 
-    Graph modelGraph;
-    Session session;
-    List<String> labels;
+    private Graph modelGraph;
+    private Session session;
+    private List<String> labels;
 
     public Classificator() {
         try {
